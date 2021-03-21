@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My test page</title>
+    <meta charset="utf-8">
+</head>
+
+  <body>
+
+    {% if latest_question_list %}
+    <ul>
+    {% for book in latest_question_list %}
+        <li><a href="{% url 'bookmanage:detail' book.id %}">{{ book.book_name }}</a></li>
+    {% endfor %}
+    </ul>
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+  </body>
+</html>
