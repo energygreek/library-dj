@@ -37,3 +37,8 @@ def SearchBook(request):
     #question = get_object_or_404(BorrowDetail, reader_id=name)
     json_result = serializers.serialize("json", BookInfo.objects.order_by('-book_id')[:5])
     return JsonResponse(json_result, safe=False)
+
+def OperateBook(request):
+    #question = get_object_or_404(BorrowDetail, reader_id=name)
+    json_result = serializers.serialize("json", BookInfo.objects.order_by('-book_id')[:5])
+    return JsonResponse(json_result, safe=False)

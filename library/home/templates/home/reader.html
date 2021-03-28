@@ -1,19 +1,8 @@
 {% extends "home/base.html" %}
 {% block title %} READER {% endblock %}
 
-<!-- Your page content -->
 {% block content %}
-<div>
-  <h4>{{ name }} 欢迎登陆READER！</h4>
-</div>
-
 <h5>个人中心</h5>
-
-<div>
-  <a href="{% url 'home:login' %}">读者登陆</a>
-  <a href="{% url 'home:login' %}">操作员登陆</a>
-  <a href="{% url 'home:logout' %}">注销</a>
-</div>
 
 <div>
   <table id="table_history" class="table table-bordered " style="overflow-y:auto;">
@@ -31,7 +20,6 @@
 
 
 <script>
-
   $(function () {
     $('#table_history').bootstrapTable({
       ajax: function (request) {

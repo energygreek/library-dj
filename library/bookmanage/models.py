@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 class BookInfo(models.Model):
     
@@ -6,7 +8,7 @@ class BookInfo(models.Model):
         verbose_name = "图书信息"
         verbose_name_plural = "图书信息s"
 
-    book_id = models.CharField(max_length=32, verbose_name="图书编号")
+    book_id = models.CharField(max_length=32,unique=True, verbose_name="图书编号")
     book_name = models.CharField(max_length=100, verbose_name="图书名称")
     book_author = models.CharField(max_length=100, verbose_name="作者")
     book_price = models.IntegerField(default=0,  verbose_name="价格")
@@ -34,7 +36,8 @@ class BookStyle(models.Model):
 
 
 class Reader(models.Model):
-    reader_id = models.CharField(max_length=32, verbose_name="读者编号")
+
+    reader_id = models.CharField(max_length=32,unique=True, verbose_name="读者编号")
     reader_name = models.CharField(max_length=32, verbose_name="读者姓名")
     reader_birth = models.DateField(verbose_name="出生日期")
     depart_name = models.CharField(max_length=32, verbose_name="部门编号")
@@ -74,8 +77,8 @@ class BorrowDetail(models.Model):
         verbose_name_plural = "借阅明细s"
 
     borrowdetail_id = models.CharField(max_length=32, verbose_name="借阅明细编号")
-    reader_id = models.CharField(max_length=32, verbose_name="读者编号")
-    book_id = models.CharField(max_length=32, verbose_name="图书编号")
+    reader_id = models.ForeignKey('Reader',to_field='reader_id',default=1, verbose_name="读者编号", on_delete=models.DO_NOTHING)
+    book_id = models.ForeignKey('BookInfo',to_field='book_id',default=1, verbose_name="图书编号", on_delete=models.DO_NOTHING)
     borrow_sl = models.IntegerField(default=0,  verbose_name="借阅数量")
     return_time = models.DateField(verbose_name="规定还书时间")
     borrow_time = models.DateField(verbose_name="借阅时间")
@@ -88,10 +91,10 @@ class ReturnDetail(models.Model):
         verbose_name_plural = "归还明细s"
 
     returndetail_id = models.CharField(max_length=32, verbose_name="归还明细编号")
-    reader_id = models.CharField(max_length=32, verbose_name="读者编号")
+    reader_id = models.ForeignKey('Reader',to_field='reader_id',default=1, verbose_name="读者编号", on_delete=models.DO_NOTHING)
     borrow_time = models.DateField(verbose_name="借阅时间")
     borrow_sl = models.IntegerField(default=0,  verbose_name="借阅数量")
-    book_id = models.CharField(max_length=32, verbose_name="归还图书编号")
+    book_id = models.ForeignKey('BookInfo',to_field='book_id',default=1, verbose_name="图书编号", on_delete=models.DO_NOTHING)
     return_sl = models.IntegerField(default=0,  verbose_name="归还数量")
     return_time_ruled = models.DateField(verbose_name="规定还书时间")
     return_time_actual = models.DateField(verbose_name="实际归还时间")
@@ -103,6 +106,8 @@ class UserDetail(models.Model):
         verbose_name = "用户详情"
         verbose_name_plural = "用户详情s"
 
+    userdetail_id = models.IntegerField(default=0,  verbose_name="后台id")
+    userdetail_readerid = models.ForeignKey('Reader',to_field='reader_id',default=1, verbose_name="读者id", on_delete=models.DO_NOTHING)
     userdetail_sex = models.CharField(max_length=32, verbose_name="性别")
     userdetail_phone = models.CharField(max_length=11, verbose_name="电话")
     userdetail_qq = models.CharField(max_length=15, verbose_name="QQ")

@@ -1,22 +1,17 @@
-
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Home</title>
-    <meta charset="utf-8">
+
+<head>
+  <title>Home</title>
+  <meta charset="utf-8">
 </head>
 
-  <body>
-    <div>        
-        <h4>{{ name }} 欢迎登陆！</h4>    
-    </div> 
-
-<div>        
+<body>
+  <h4>{{ name }} 欢迎进入图书管理系统！</h4>
+  <div>
     <a href="{% url 'home:login' %}">登陆</a>
     <a href="{% url 'home:logout' %}">注销</a>
-</div>
-<p>图书查询</p>
+  </div>
+</body>
 
-  </body>
 </html>

@@ -3,141 +3,109 @@
 
 <!-- Your page content -->
 {% block content %}
-<div>
-    <h4>{{ name }} 欢迎登陆Operator！</h4>
-</div>
-<div>
-    <a href="{% url 'home:login' %}">读者登陆</a>
-    <a href="{% url 'home:login' %}">操作员登陆</a>
-    <a href="{% url 'home:logout' %}">注销</a>
-</div>
 
-<p><input type="text" id="Name"  placeholder="请扫读者证条码"/></p>
-<p><input type="text" id="Id" placeholder="请扫图书条码" />  <button id="doprepend" onclick="doprepend()">提交</button></p>
-
-<ul id="myTab" class="nav nav-tabs">
-	<li class="active"><a href="#borrow_record" data-toggle="tab">
-		借阅登记</a></li>
-	<li><a href="#return_record" data-toggle="tab">还书登记</a></li>
-</ul>
-
-<div id="myTabContent" class="tab-content">
-	<div class="tab-pane fade in active" id="borrow_record">
-        <table id="table_borrow" class="table table-bordered " style="overflow-y:auto;"></table>
-	</div>
-	<div class="tab-pane fade" id="return_record">
-        <table id="table_return" class="table table-bordered " style="overflow-y:auto;"></table>
-	</div>
+<div class="bs-example">
+    <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-primary active">
+            <input type="radio" name="options" id="borrow" class="operation_select" value="borrow"> 借阅登记
+        </label>
+        <label class="btn btn-primary">
+            <input type="radio" name="options" id="return" class="operation_select" value="return"> 归还登记
+        </label>
+        <label class="btn btn-primary">
+            <input type="radio" name="options" id="query" class="operation_select" value="query"> 历史查询
+        </label>
+    </div>
 </div>
+<br>
+<p><input type="text" id="reader_id"  placeholder="请扫读者证条码"/></p>
+<p><input type="text" id="book_code" placeholder="请扫图书条码" onkeydown="entersearch()" />  </p>
+<p><button id="doprepend" onclick="operator_submit()">提交</button></p>
+<table id="table" class="table table-bordered " style="overflow-y:auto;"></table>
 
 <script>
     $(function () {
-        //设置需要显示的列(默认表头)
         var columns = [
             { field: "Id", title: '条码' },
             { field: 'Name', title: '书名' },
         ];
-
-        //给表添加默认数据
-        var data = [
-            { Id: '001', Name: '张三' },
-            { Id: '002', Name: '李四' },
-            { Id: '003', Name: '王五' },
-            //{ Id: 601, Car: 'Car-X2', },
-            //{ Id: 30, Car: 'Car-X3', }
-        ];
-
-        //bootstrap table初始化数据（渲染到Table里面）
-        $('#table_borrow').bootstrapTable({
+        $('#table').bootstrapTable({
             classes: "table table-hover",
-            // toolbar: "#toolbar",
-            data: data,
+            data: "",
             columns: columns,
             pageSize: 4, //每页的记录行数（*）
             pageNumber: 1,  //初始第1页
             pageList: [2, 4, 6, 8],  //这里不知道为啥没有用
-
-            //, page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
-            //    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
-            //    //,curr: 5 //设定初始在第 5 页
-            //    , groups: 1 //只显示 1 个连续页码
-            //    , first: false //不显示首页
-            //    , last: false
-            //    //不显示尾页
-
-            //},
             pagination: true,//是否显示分页
             locale: 'zh-CN',//中文支持,
             rowStyle: rowStyle,
-            //showRefresh: true, //是否显示刷新按钮
             sortable: false, //是否启用排序
             sortOrder: "desc", //排序方式
-            // search: true, //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，
-
-            //在这里加一个高度的属性就可以固定住表格的高度
-            height: 250
-        });
-
-        //bootstrap table初始化数据（渲染到Table里面）
-        $('#table_return').bootstrapTable({
-            classes: "table table-hover",
-            // toolbar: "#toolbar",
-            data: data,
-            columns: columns,
-            pageSize: 4, //每页的记录行数（*）
-            pageNumber: 1,  //初始第1页
-            pageList: [2, 4, 6, 8],  //这里不知道为啥没有用
-
-            //, page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
-            //    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
-            //    //,curr: 5 //设定初始在第 5 页
-            //    , groups: 1 //只显示 1 个连续页码
-            //    , first: false //不显示首页
-            //    , last: false
-            //    //不显示尾页
-
-            //},
-            pagination: true,//是否显示分页
-            locale: 'zh-CN',//中文支持,
-            rowStyle: rowStyle,
-            //showRefresh: true, //是否显示刷新按钮
-            sortable: false, //是否启用排序
-            sortOrder: "desc", //排序方式
-            // search: true, //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，
-
-            //在这里加一个高度的属性就可以固定住表格的高度
             height: 250
         });
     })
 
+    // 提交
+    function operator_submit(){
 
-    function doprepend() {//按钮点击事件
-        //newData需要追加的新数据
-        var ID = $("#Id").val();
-        var Name = $("#Name").val();
-        var Age = $("#Age").val();
-        var Sex = $("#Sex").val();
-        var rows = $("#table tr");
-        if (ID == "" || ID == null) {
-            alert("id不能为空");
+        var operation = $(".operation_select:checked").val();
+        var reader_id = $("#reader_id").val();        
+        var data= $('#table').bootstrapTable('getData',false);
+        var token = "{{ csrf_token }}"
+
+        $.ajax({
+        type: "POST",
+        url: "{% url 'bookmanage:operatebook' %}",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        headers: { 'X-CSRFTOKEN': token },
+        data: {"reader_id": reader_id, "operation": operation, "data":data },
+        json: 'callback',
+        success: function (msg) {
+            json_msg = JSON.parse(msg)[0]['fields'];
+            $('#table').bootstrapTable('append', json_msg);
+        },
+        error: function () {
+            alert("错误");
+        }
+        });
+    }
+
+    // 扫码触发事件
+    function entersearch(){
+        var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13)
+        {
+            doprepend();
+        }
+    }
+
+    // 添加数据
+    function doprepend() {
+
+        var book_code = $("#book_code").val();
+        var rows = $("#table_borrow tr");
+        if (book_code == "" || book_code == null) {
+            alert("条码不能为空");
             return false;
         }
         //防呆防止数据重复
         if (rows.length > 0) {
             for (var i = 0; i < rows.length; i++) {
                 var center = rows[i].cells[0].innerText.replace(/\s+/g, "");//循环遍历获取table的id
-                if (center == ID) {//判断是否为同一个id
+                if (center == book_code) {//判断是否为同一个id
                     alert("条码不允许重复扫描");
                     return false;
                 }
             }
         }
 
-        var newData = [
-            { Id: ID, Name: Name, Age: Age },
-        ];
+        
 
-        $('#table').bootstrapTable('prepend', newData);//追加到Table **`注：prepend追加到第一行，Append 添加到最后一行`**
+        var newData = [
+            { Id: ID, Name: Name },
+        ];
+        $('#table-br').bootstrapTable('prepend', newData);//追加到Table **`注：prepend追加到第一行，Append 添加到最后一行`**
     }
     //添加行内样式
     function rowStyle(row, index) {
