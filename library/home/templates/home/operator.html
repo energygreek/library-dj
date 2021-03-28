@@ -1,30 +1,37 @@
+{% extends "home/base.html" %}
+{% block title %} OPERATOR {% endblock %}
 
+<!-- Your page content -->
+{% block content %}
+<div>
+    <h4>{{ name }} 欢迎登陆Operator！</h4>
+</div>
+<div>
+    <a href="{% url 'home:login' %}">读者登陆</a>
+    <a href="{% url 'home:login' %}">操作员登陆</a>
+    <a href="{% url 'home:logout' %}">注销</a>
+</div>
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>OPR</title>
-    <meta charset="utf-8">
+<p><input type="text" id="Name"  placeholder="请扫读者证条码"/></p>
+<p><input type="text" id="Id" placeholder="请扫图书条码" />  <button id="doprepend" onclick="doprepend()">提交</button></p>
 
-<!-- 新 Bootstrap 核心 CSS 文件 -->
-<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<ul id="myTab" class="nav nav-tabs">
+	<li class="active"><a href="#borrow_record" data-toggle="tab">
+		借阅登记</a></li>
+	<li><a href="#return_record" data-toggle="tab">还书登记</a></li>
+</ul>
 
-<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-
-<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-<!-- bootstrap-table -->
-<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css">
-<script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
+<div id="myTabContent" class="tab-content">
+	<div class="tab-pane fade in active" id="borrow_record">
+        <table id="table_borrow" class="table table-bordered " style="overflow-y:auto;"></table>
+	</div>
+	<div class="tab-pane fade" id="return_record">
+        <table id="table_return" class="table table-bordered " style="overflow-y:auto;"></table>
+	</div>
+</div>
 
 <script>
-
-
     $(function () {
-
-
         //设置需要显示的列(默认表头)
         var columns = [
             { field: "Id", title: '条码' },
@@ -40,9 +47,8 @@
             //{ Id: 30, Car: 'Car-X3', }
         ];
 
-
         //bootstrap table初始化数据（渲染到Table里面）
-        $('#table').bootstrapTable({
+        $('#table_borrow').bootstrapTable({
             classes: "table table-hover",
             // toolbar: "#toolbar",
             data: data,
@@ -64,12 +70,43 @@
             locale: 'zh-CN',//中文支持,
             rowStyle: rowStyle,
             //showRefresh: true, //是否显示刷新按钮
-            sortable: true, //是否启用排序
+            sortable: false, //是否启用排序
             sortOrder: "desc", //排序方式
             // search: true, //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，
 
             //在这里加一个高度的属性就可以固定住表格的高度
-            height:250
+            height: 250
+        });
+
+        //bootstrap table初始化数据（渲染到Table里面）
+        $('#table_return').bootstrapTable({
+            classes: "table table-hover",
+            // toolbar: "#toolbar",
+            data: data,
+            columns: columns,
+            pageSize: 4, //每页的记录行数（*）
+            pageNumber: 1,  //初始第1页
+            pageList: [2, 4, 6, 8],  //这里不知道为啥没有用
+
+            //, page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+            //    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+            //    //,curr: 5 //设定初始在第 5 页
+            //    , groups: 1 //只显示 1 个连续页码
+            //    , first: false //不显示首页
+            //    , last: false
+            //    //不显示尾页
+
+            //},
+            pagination: true,//是否显示分页
+            locale: 'zh-CN',//中文支持,
+            rowStyle: rowStyle,
+            //showRefresh: true, //是否显示刷新按钮
+            sortable: false, //是否启用排序
+            sortOrder: "desc", //排序方式
+            // search: true, //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，
+
+            //在这里加一个高度的属性就可以固定住表格的高度
+            height: 250
         });
     })
 
@@ -112,34 +149,4 @@
     }
 </script>
 
-</head>
-
-  <body>
-    <div>        
-        <h4>{{ name }} 欢迎登陆OPR！</h4>    
-    </div> 
-
-    <h5>借阅登记</h5>
-
-
-<div>        
-    <a href="{% url 'home:login' %}">读者登陆</a>
-    <a href="{% url 'home:login' %}">操作员登陆</a>
-    <a href="{% url 'home:logout' %}">注销</a>
-</div>
-
-<p>图书查询</p>
-
-
-<div>
-    <p>条码：<input type="text" id="Id" /></p>
-    <p>书名：<input type="text" id="Name" /></p>
-    <p><button id="doprepend" onclick="doprepend()">添加</button></p>
-    @*style="overflow-y:auto;让表格可以左右滑动*@
-    <table id="table" class="table table-bordered " style="overflow-y:auto;"></table>
-
-
-</div>
-
-  </body>
-</html>
+{% endblock %}

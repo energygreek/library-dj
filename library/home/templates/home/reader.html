@@ -1,24 +1,164 @@
+{% extends "home/base.html" %}
+{% block title %} READER {% endblock %}
 
-
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>READER</title>
-    <meta charset="utf-8">
-</head>
-
-  <body>
-    <div>        
-        <h4>{{ name }} 欢迎登陆READER！</h4>    
-    </div> 
-
-    <h5>个人中心</h5>
-
-<div>        
-    <a href="{% url 'home:login' %}">登陆</a>
-    <a href="{% url 'home:logout' %}">注销</a>
+<!-- Your page content -->
+{% block content %}
+<div>
+  <h4>{{ name }} 欢迎登陆READER！</h4>
 </div>
-<p>图书查询</p>
 
-  </body>
-</html>
+<h5>个人中心</h5>
+
+<div>
+  <a href="{% url 'home:login' %}">读者登陆</a>
+  <a href="{% url 'home:login' %}">操作员登陆</a>
+  <a href="{% url 'home:logout' %}">注销</a>
+</div>
+
+<div>
+  <table id="table_history" class="table table-bordered " style="overflow-y:auto;">
+  <caption>已借历史</caption>
+  </table>
+</div>
+<br>
+<br>
+<h3 class="text-center">图书查询</h3>
+<div>
+  <input type="text" id="book_name" placeholder="请输入书名"/>
+  <button id="search_book" onclick="search_book()">查询</button>
+  <table id="table_search" class="table table-bordered " style="overflow-y:auto;"></table>
+</div>
+
+
+<script>
+
+  $(function () {
+    $('#table_history').bootstrapTable({
+      ajax: function (request) {
+        $.ajax({
+          type: "GET",
+          url: "{% url 'bookmanage:getrentbook' name %}",
+          contentType: "application/json;charset=utf-8",
+          dataType: "json",
+          data: '',
+          json: 'callback',
+          success: function (msg) {
+            request.success({
+              row: msg
+            });
+            $('#table_history').bootstrapTable('load', msg);
+          },
+          error: function () {
+            alert("错误");
+          }
+        });
+      },
+
+      toolbar: '#toolbar',
+      singleSelect: true,
+      clickToSelect: true,
+      sortName: "create_time",
+      sortOrder: "desc",
+      pageSize: 15,
+      pageNumber: 1,
+      pageList: "[10, 25, 50, 100, All]",
+      showToggle: true,
+      showRefresh: true,
+      showColumns: true,
+      search: true,
+      pagination: true,
+      
+      columns: [{
+        field: "state",
+        checkbox: true,
+      }, {
+        field: 'book_name',
+        title: '书籍名称',
+        switchable: true
+      }, {
+        field: 'book_author',
+        title: '作者',
+        switchable: true
+      },{
+        field: 'borrow_time',
+        title: '借阅时间',
+        switchable: true
+      }],
+    });
+  });
+
+  function search_book() {
+
+    var book_name = $("#book_name").val();
+    var rows = $("#table tr");
+    var token = "{{ csrf_token }}"
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'bookmanage:searchbook' %}",
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      headers: { 'X-CSRFTOKEN': token },
+      data: {"book_name": book_name },
+      json: 'callback',
+      success: function (msg) {
+        debugger
+        json_msg = JSON.parse(msg)[0]['fields'];
+        $('#table_search').bootstrapTable('append', json_msg);
+      },
+      error: function () {
+        alert("错误");
+      }
+    });
+  }
+
+  $(function () {
+
+    //设置需要显示的列(默认表头)
+    var columns = [
+      { field: "book_id", title: '编号' },
+      { field: 'book_name', title: '书名' },
+      { field: 'book_author', title: '作者' },
+      { field: 'book_sl', title: '数量' },
+      { field: 'book_shelf', title: '所在书架' },
+    ];
+
+    //给表添加默认数据
+    var data = [
+      //{ Id: 601, Car: 'Car-X2', },
+      //{ Id: 30, Car: 'Car-X3', }
+    ];
+
+
+    //bootstrap table初始化数据（渲染到Table里面）
+    $('#table_search').bootstrapTable({
+      classes: "table table-hover",
+      toolbar: "#toolbar",
+      data: data,
+      columns: columns,
+      pageSize: 4, //每页的记录行数（*）
+      pageNumber: 1,  //初始第1页
+      pageList: [2, 4, 6, 8],  //这里不知道为啥没有用
+      pagination: true,//是否显示分页
+      locale: 'zh-CN',//中文支持,
+      rowStyle: rowStyle,
+      //showRefresh: true, //是否显示刷新按钮
+      sortable: true, //是否启用排序
+      sortOrder: "desc", //排序方式
+      //search: true, //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，
+      //在这里加一个高度的属性就可以固定住表格的高度
+      height: 250
+    });
+  })
+
+  //添加行内样式
+  function rowStyle(row, index) {
+    var style = {};
+    if (row.Age > 35) {
+      style = { css: { 'background-color': '#ed5565' } };
+    }
+    return style;
+  }
+</script>
+
+{% endblock %}
