@@ -6,18 +6,19 @@
 
 <div>
   <table id="table_history" class="table table-bordered " style="overflow-y:auto;">
-  <caption>已借历史</caption>
+    <caption>借阅历史</caption>
   </table>
 </div>
+
 <br>
 <br>
-<h3 class="text-center">图书查询</h3>
+
 <div>
   <input type="text" id="book_name" placeholder="请输入书名"/>
-  <button id="search_book" onclick="search_book()">查询</button>
-  <table id="table_search" class="table table-bordered " style="overflow-y:auto;"></table>
+  <button id="search_book" onclick="search_book()">图书查询</button>
+  <table id="table_search" class="table table-bordered " style="overflow-y:auto;">
+  </table>
 </div>
-
 
 <script>
   $(function () {

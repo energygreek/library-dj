@@ -43,5 +43,7 @@ def operator(request):
 
 def reader(request):
     name = request.user.username
+
+    
     # 查询出所借图书
     return render(request, 'home/reader.html',{'name':name})

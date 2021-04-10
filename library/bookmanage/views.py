@@ -1,10 +1,10 @@
 import json
+from django.contrib import auth
 from bookmanage.models import BookInfo, BorrowDetail
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, JsonResponse
 from django.urls.base import reverse
 from django.utils import timezone
-from polls.models import Choice, Question
 from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponse
@@ -29,9 +29,10 @@ class DetailView(generic.DetailView):
 
 def GetRentBook(request, name):
     #question = get_object_or_404(BorrowDetail, reader_id=name)
+    current_user = auth.get_user(request)
     json_result = serializers.serialize("json", BookInfo.objects.order_by('-book_id')[:5])
-    fileds = json.loads(json_result)[0]['fields']
-    return JsonResponse(fileds, safe=False)
+
+    return JsonResponse(json_result, safe=False)
 
 def SearchBook(request):
     #question = get_object_or_404(BorrowDetail, reader_id=name)
